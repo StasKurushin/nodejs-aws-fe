@@ -115,19 +115,23 @@ export default function PageOrder() {
       return;
     }
     const promises: any[] = [
-      axios.get(`${API_PATHS.product}/product`),
+      axios.get(`${API_PATHS.products}/product/available`),
       axios.get(`${API_PATHS.order}/order/${id}`)
     ];
     Promise.all(promises)
       .then(([{data: products}, {data: order}]) => {
         const cartItems: CartItem[] = order.items.map((i: OrderItem) => ({
-          product: products.find((p: Product) => p.id === i.productId),
+          product: products.mockedProducts.find((p: Product) => p.id === i.productId),
           count: i.count
         }));
         setOrder(order);
         setCartItems(cartItems);
         setIsLoading(false);
-      });
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error)
+      })
   }, [id])
 
   if (isLoading) return <p>loading...</p>;
