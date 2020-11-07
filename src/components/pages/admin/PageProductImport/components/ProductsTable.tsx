@@ -14,55 +14,66 @@ import {formatAsPrice} from "utils/utils";
 
 export default function ProductsTable() {
   const [products, setProducts] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    axios.get(`${API_PATHS.bff}/product`)
-      .then(res => setProducts(res.data));
+    axios.get(`${API_PATHS.products}/products/available`)
+      .then(res => {
+        setProducts(res.data.mockedProducts);
+        setIsLoading(false)
+      })
+      .catch(error => {
+        console.log(error);
+        setIsLoading(false);
+      })
   }, []);
 
   const onDelete = (id: string) => {
     axios.delete(`${API_PATHS.bff}/product/${id}`)
-      .then(() => {
-        axios.get(`${API_PATHS.bff}/product`)
-          .then(res => setProducts(res.data));
-        }
-      );
+      .then(() => axios.get(`${API_PATHS.products}/products/available`)
+      .then(res => setProducts(res.data.mockedProducts)))
+      .catch(error => {
+        console.log(error);
+        setIsLoading(false);
+      })
   };
 
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell align="right">Description</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Count</TableCell>
-            <TableCell align="right">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {products.map((product: any) => (
-            <TableRow key={product.id}>
-              <TableCell component="th" scope="row">
-                {product.title}
-              </TableCell>
-              <TableCell align="right">{product.description}</TableCell>
-              <TableCell align="right">{formatAsPrice(product.price)}</TableCell>
-              <TableCell align="right">{product.count}</TableCell>
-              <TableCell align="right">
-                <Button size="small" color="primary" component={Link} to={`/admin/product-form/${product.id}`}>
-                  Manage
-                </Button>
-                <Button size="small" color="secondary" onClick={() => onDelete(product.id)}>
-                  Delete
-                </Button>
-              </TableCell>
+      {isLoading ? 'Loading...' : (
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell align="right">Description</TableCell>
+              <TableCell align="right">Price</TableCell>
+              <TableCell align="right">Count</TableCell>
+              <TableCell align="right">Action</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {products.map((product: any) => (
+              <TableRow key={product.id}>
+                <TableCell component="th" scope="row">
+                  {product.title}
+                </TableCell>
+                <TableCell align="right">{product.description}</TableCell>
+                <TableCell align="right">{formatAsPrice(product.price)}</TableCell>
+                <TableCell align="right">{product.count}</TableCell>
+                <TableCell align="right">
+                  <Button size="small" color="primary" component={Link} to={`/admin/product-form/${product.id}`}>
+                    Manage
+                  </Button>
+                  <Button size="small" color="secondary" onClick={() => onDelete(product.id)}>
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </TableContainer>
   );
 }
