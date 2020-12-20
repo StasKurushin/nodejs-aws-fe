@@ -38,7 +38,7 @@ export default function Products() {
   useEffect(() => {
     axios.get(`${API_PATHS.products}/products/available`)
       .then(res => {
-        setProducts(res.data.mockedProducts);
+        setProducts(res.data.products);
         setIsLoading(false)
       })
       .catch(error => {
