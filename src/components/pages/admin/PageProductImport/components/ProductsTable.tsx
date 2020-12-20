@@ -19,7 +19,7 @@ export default function ProductsTable() {
   useEffect(() => {
     axios.get(`${API_PATHS.products}/products/available`)
       .then(res => {
-        setProducts(res.data.mockedProducts);
+        setProducts(res.data.products);
         setIsLoading(false)
       })
       .catch(error => {
@@ -31,7 +31,7 @@ export default function ProductsTable() {
   const onDelete = (id: string) => {
     axios.delete(`${API_PATHS.bff}/product/${id}`)
       .then(() => axios.get(`${API_PATHS.products}/products/available`)
-      .then(res => setProducts(res.data.mockedProducts)))
+      .then(res => setProducts(res.data.products)))
       .catch(error => {
         console.log(error);
         setIsLoading(false);
